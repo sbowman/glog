@@ -42,3 +42,11 @@ Google, not here. The code in this repo is for export only and is not itself
 under development. Feature requests will be ignored.
 
 Send bug reports to golang-nuts@googlegroups.com.
+
+sbowman/glog
+============
+
+This revision of glog simply deprecates flag-based configuration in favor
+of manual configuration.  This allows you to use glog with alternate
+command line parsers, such as github.com/codegangsta/cli.
+
