@@ -43,7 +43,6 @@ func (c *GlogConfig) Init() {
 
 	setThreshold(c.StderrThreshold)
 
-	logging.setVState(0, nil, false)
 	go logging.flushDaemon()
 }
 
