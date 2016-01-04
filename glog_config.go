@@ -1,27 +1,31 @@
 package glog
 
-// Mirrors the internal configuration struct used by glog, to expose settings
-// to applications.
+// GlogConfig mirrors the internal configuration struct used by glog, to expose
+// settings to applications.
 type GlogConfig struct {
-	// log to standard error instead of files
+	// ToStderr is true indicates log to standard error instead of files.
 	ToStderr bool
 
-	// log to standard error as well as files
+	// AlsoToStderr of true indicates to log to standard error as well as files.
 	AlsoToStderr bool
 
-	// logs at or above this threshold go to stderr
+	// StderrThreshold logs at or above this threshold go to stderr.
 	StderrThreshold string
 
-	// when logging hits line file:N, emit a stack trace
+	// TraceLocation defines when logging hits line file:N, emit a stack trace.
 	TraceLocation string
 
-	// comma-separated list of pattern=N settings for file-filtered logging
+	// Vmodule is a comma-separated list of pattern=N settings for file-filtered logging.
 	Vmodule string
 
-	// log level for V logs: 0, 1, 2, 3, etc.
+	// Verbosity indicates the log level for V logs: 0, 1, 2, 3, etc.
 	Verbosity string
+
+	// LogDir points to the directory in which to write log files.
+	LogDir string
 }
 
+// NewConfig creates a new GlogConfig with the default settings.
 func NewConfig() *GlogConfig {
 	return &GlogConfig{
 		ToStderr:        false,
@@ -30,16 +34,19 @@ func NewConfig() *GlogConfig {
 		StderrThreshold: "info",
 		Vmodule:         "",
 		TraceLocation:   "",
+		LogDir:          "",
 	}
 }
 
-// Apply the logging configuration to the glog system.
+// Init applies the logging configuration to the glog system.
 func (c *GlogConfig) Init() {
 	logging.toStderr = c.ToStderr
 	logging.alsoToStderr = c.AlsoToStderr
 	logging.verbosity.Set(c.Verbosity)
 	logging.vmodule.Set(c.Vmodule)
 	logging.traceLocation.Set(c.TraceLocation)
+
+	logDirs = []string{c.LogDir}
 
 	setThreshold(c.StderrThreshold)
 
