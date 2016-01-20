@@ -46,7 +46,9 @@ func (c *GlogConfig) Init() {
 	logging.vmodule.Set(c.Vmodule)
 	logging.traceLocation.Set(c.TraceLocation)
 
-	logDirs = []string{c.LogDir}
+	if c.LogDir != "" {
+		logDirs = []string{c.LogDir}
+	}
 
 	setThreshold(c.StderrThreshold)
 
