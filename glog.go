@@ -77,6 +77,7 @@ import (
 	"fmt"
 	"io"
 	stdLog "log"
+	"net"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -1161,4 +1162,23 @@ func Exitln(args ...interface{}) {
 func Exitf(format string, args ...interface{}) {
 	atomic.StoreUint32(&fatalNoStacks, 1)
 	logging.printf(fatalLog, format, args...)
+}
+
+// GetHost will return either the hostname or the IP address of this machine.
+func GetHost() (string, error) {
+	name, err := os.Hostname()
+	if err != nil {
+		addrs, err := net.InterfaceAddrs()
+		if err != nil {
+			return "", err
+		}
+
+		if len(addrs) == 0 {
+			return "", fmt.Errorf("Unable to query the network interfaces on this server: %s", err)
+		}
+
+		return addrs[0].String(), nil
+	}
+
+	return name, nil
 }
