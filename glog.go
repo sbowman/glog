@@ -438,6 +438,8 @@ type loggingT struct {
 	// safely using atomic.LoadInt32.
 	vmodule   moduleSpec // The state of the -vmodule flag.
 	verbosity Level      // V logging level, the value of the -v flag/
+
+	errorCode int // The error code (if any)
 }
 
 // buffer holds a byte Buffer for reuse. The zero value is ready for use.
@@ -967,6 +969,9 @@ func (l *loggingT) setV(pc uintptr) Level {
 // See the documentation of V for more information.
 type Verbose bool
 
+// EC is an int type that implements Warning and Error level logging
+type EC int
+
 // V reports whether verbosity at the call site is at least the requested level.
 // The returned value is a boolean of type Verbose, which implements Info, Infoln
 // and Infof. These methods will write to the Info log if called.
@@ -1064,10 +1069,24 @@ func Warning(args ...interface{}) {
 	logging.print(warningLog, args...)
 }
 
+// Warning is equivalent to the global Warning function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Warning(args ...interface{}) {
+	logging.errorCode = int(c)
+	Warning(args...)
+}
+
 // WarningDepth acts as Warning but uses depth to determine which call frame to log.
 // WarningDepth(0, "msg") is the same as Warning("msg").
 func WarningDepth(depth int, args ...interface{}) {
 	logging.printDepth(warningLog, depth, args...)
+}
+
+// WarningDepth is equivalent to the global WarningDepth function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) WarningDepth(depth int, args ...interface{}) {
+	logging.errorCode = int(c)
+	WarningDepth(depth, args...)
 }
 
 // Warningln logs to the WARNING and INFO logs.
@@ -1076,10 +1095,24 @@ func Warningln(args ...interface{}) {
 	logging.println(warningLog, args...)
 }
 
+// Warningln is equivalent to the global Warningln function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Warningln(args ...interface{}) {
+	logging.errorCode = int(c)
+	Warningln(args...)
+}
+
 // Warningf logs to the WARNING and INFO logs.
 // Arguments are handled in the manner of fmt.Printf; a newline is appended if missing.
 func Warningf(format string, args ...interface{}) {
 	logging.printf(warningLog, format, args...)
+}
+
+// Warningf is equivalent to the global Warningf function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Warningf(format string, args ...interface{}) {
+	logging.errorCode = int(c)
+	Warningf(format, args...)
 }
 
 // Error logs to the ERROR, WARNING, and INFO logs.
@@ -1088,10 +1121,24 @@ func Error(args ...interface{}) {
 	logging.print(errorLog, args...)
 }
 
+// Error is equivalent to the global Error function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Error(args ...interface{}) {
+	logging.errorCode = int(c)
+	Error(args...)
+}
+
 // ErrorDepth acts as Error but uses depth to determine which call frame to log.
 // ErrorDepth(0, "msg") is the same as Error("msg").
 func ErrorDepth(depth int, args ...interface{}) {
 	logging.printDepth(errorLog, depth, args...)
+}
+
+// ErrorDepth is equivalent to the global ErrorDepth function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) ErrorDepth(depth int, args ...interface{}) {
+	logging.errorCode = int(c)
+	ErrorDepth(depth, args...)
 }
 
 // Errorln logs to the ERROR, WARNING, and INFO logs.
@@ -1100,10 +1147,24 @@ func Errorln(args ...interface{}) {
 	logging.println(errorLog, args...)
 }
 
+// Errorln is equivalent to the global Errorln function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Errorln(args ...interface{}) {
+	logging.errorCode = int(c)
+	Errorln(args...)
+}
+
 // Errorf logs to the ERROR, WARNING, and INFO logs.
 // Arguments are handled in the manner of fmt.Printf; a newline is appended if missing.
 func Errorf(format string, args ...interface{}) {
 	logging.printf(errorLog, format, args...)
+}
+
+// Errorf is equivalent to the global Errorf function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Errorf(format string, args ...interface{}) {
+	logging.errorCode = int(c)
+	Errorf(format, args...)
 }
 
 // Fatal logs to the FATAL, ERROR, WARNING, and INFO logs,
@@ -1113,10 +1174,24 @@ func Fatal(args ...interface{}) {
 	logging.print(fatalLog, args...)
 }
 
+// Fatal is equivalent to the global Fatal function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Fatal(args ...interface{}) {
+	logging.errorCode = int(c)
+	Fatal(args...)
+}
+
 // FatalDepth acts as Fatal but uses depth to determine which call frame to log.
 // FatalDepth(0, "msg") is the same as Fatal("msg").
 func FatalDepth(depth int, args ...interface{}) {
 	logging.printDepth(fatalLog, depth, args...)
+}
+
+// FatalDepth is equivalent to the global FatalDepth function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) FatalDepth(depth int, args ...interface{}) {
+	logging.errorCode = int(c)
+	FatalDepth(depth, args...)
 }
 
 // Fatalln logs to the FATAL, ERROR, WARNING, and INFO logs,
@@ -1126,11 +1201,25 @@ func Fatalln(args ...interface{}) {
 	logging.println(fatalLog, args...)
 }
 
+// Fatalln is equivalent to the global Fatalln function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Fatalln(args ...interface{}) {
+	logging.errorCode = int(c)
+	Fatalln(args...)
+}
+
 // Fatalf logs to the FATAL, ERROR, WARNING, and INFO logs,
 // including a stack trace of all running goroutines, then calls os.Exit(255).
 // Arguments are handled in the manner of fmt.Printf; a newline is appended if missing.
 func Fatalf(format string, args ...interface{}) {
 	logging.printf(fatalLog, format, args...)
+}
+
+// Fatalf is equivalent to the global Fatalf function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Fatalf(format string, args ...interface{}) {
+	logging.errorCode = int(c)
+	Fatalf(format, args...)
 }
 
 // fatalNoStacks is non-zero if we are to exit without dumping goroutine stacks.
@@ -1144,11 +1233,25 @@ func Exit(args ...interface{}) {
 	logging.print(fatalLog, args...)
 }
 
+// Exit is equivalent to the global Exit function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Exit(args ...interface{}) {
+	logging.errorCode = int(c)
+	Exit(args...)
+}
+
 // ExitDepth acts as Exit but uses depth to determine which call frame to log.
 // ExitDepth(0, "msg") is the same as Exit("msg").
 func ExitDepth(depth int, args ...interface{}) {
 	atomic.StoreUint32(&fatalNoStacks, 1)
 	logging.printDepth(fatalLog, depth, args...)
+}
+
+// ExitDepth is equivalent to the global ExitDepth function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) ExitDepth(depth int, args ...interface{}) {
+	logging.errorCode = int(c)
+	ExitDepth(depth, args...)
 }
 
 // Exitln logs to the FATAL, ERROR, WARNING, and INFO logs, then calls os.Exit(1).
@@ -1157,11 +1260,25 @@ func Exitln(args ...interface{}) {
 	logging.println(fatalLog, args...)
 }
 
+// Exitln is equivalent to the global Exitln function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Exitln(args ...interface{}) {
+	logging.errorCode = int(c)
+	Exitln(args...)
+}
+
 // Exitf logs to the FATAL, ERROR, WARNING, and INFO logs, then calls os.Exit(1).
 // Arguments are handled in the manner of fmt.Printf; a newline is appended if missing.
 func Exitf(format string, args ...interface{}) {
 	atomic.StoreUint32(&fatalNoStacks, 1)
 	logging.printf(fatalLog, format, args...)
+}
+
+// Exitf is equivalent to the global Exitf function, but it sets the loggingT object's
+// error code on the way in.
+func (c EC) Exitf(format string, args ...interface{}) {
+	logging.errorCode = int(c)
+	Exitf(format, args...)
 }
 
 // GetHost will return either the hostname or the IP address of this machine.
