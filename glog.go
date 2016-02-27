@@ -536,7 +536,7 @@ func (l *loggingT) header(s severity, depth int) (*buffer, string, int) {
 
 // formatHeader formats a log header using the provided file name and line number.
 func (l *loggingT) formatHeader(s severity, file string, line int) *buffer {
-	now := timeNow()
+	now := timeNow().UTC()
 	if line < 0 {
 		line = 0 // not a real line number, but acceptable to someDigits
 	}
@@ -559,16 +559,16 @@ func (l *loggingT) formatHeader(s severity, file string, line int) *buffer {
 	buf.tmp[10] = ' '
 
 	buf.twoDigits(11, hour)
-	buf.tmp[12] = ':'
-	buf.twoDigits(13, minute)
-	buf.tmp[15] = ':'
-	buf.twoDigits(16, second)
-	buf.tmp[18] = '.'
-	buf.nDigits(6, 19, now.Nanosecond()/1000, '0')
-	buf.tmp[25] = ' '
-	buf.nDigits(7, 26, pid, ' ') // TODO: should be TID
-	buf.tmp[33] = ' '
-	buf.Write(buf.tmp[:34])
+	buf.tmp[13] = ':'
+	buf.twoDigits(14, minute)
+	buf.tmp[16] = ':'
+	buf.twoDigits(17, second)
+	buf.tmp[19] = '.'
+	buf.nDigits(6, 20, now.Nanosecond()/1000, '0')
+	buf.tmp[26] = ' '
+	buf.nDigits(7, 27, pid, ' ') // TODO: should be TID
+	buf.tmp[34] = ' '
+	buf.Write(buf.tmp[:35])
 	buf.WriteString(file)
 	buf.tmp[0] = ':'
 	n := buf.someDigits(1, line)
