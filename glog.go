@@ -977,6 +977,11 @@ type Verbose bool
 // EC is an int type that implements Warning and Error level logging
 type EC int
 
+// GetV returns the verbosity level.
+func GetV() Level {
+	return logging.verbosity.get()
+}
+
 // V reports whether verbosity at the call site is at least the requested level.
 // The returned value is a boolean of type Verbose, which implements Info, Infoln
 // and Infof. These methods will write to the Info log if called.
