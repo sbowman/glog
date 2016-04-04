@@ -556,6 +556,7 @@ func (l *loggingT) formatHeader(s severity, file string, line int) *buffer {
 	buf.tmp[5] = ' '
 
 	buf.nDigits(3, 6, l.errorCode, ' ')
+	l.errorCode = 0
 	buf.tmp[10] = ' '
 
 	buf.twoDigits(11, hour)
